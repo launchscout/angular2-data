@@ -4,12 +4,21 @@ import {reflector} from 'angular2/src/core/reflection/reflection';
 import "rxjs/Rx";
 export { StoreConfig } from "./store-config";
 export { Model } from "./model";
+import { DefaultSerializer } from "./default-serializer";
+export { DefaultSerializer };
 
 export class Store {
   constructor(@Inject(Http) public http:Http) {}
 
   get config() {
     return reflector.annotations(this.constructor)[0].config;
+  }
+
+  get serializer() {
+    if (!this._serializer) {
+      this._serializer = new DefaultSerializer();
+    }
+    return this._serializer;
   }
 
   getModelMetadata(domainClass) {
@@ -24,22 +33,19 @@ export class Store {
 
   query(domainClass) {
     return this.http.get(this.buildUrl(domainClass))
-      .map(res => res.json().data)
-      .map(propertiesArray => propertiesArray.map((props) => new domainClass(props)));
+      .map(res => this.serializer.deserializeMany(res, domainClass));
   }
 
-  getPayloadKey(instance) {
-    return this.getModelMetadata(instance.constructor).payloadKey || "data";
+  find(domainClass, id) {
+    return this.http.get(`${this.buildUrl(domainClass)}/${id}`)
+      .map(res => this.serializer.deserializeOne(res, domainClass));
   }
 
   create(instance) {
     let headers = new Headers();
     headers.append("Content-Type", "application/json");
-    let payload = {};
-    payload[this.getPayloadKey(instance)] = instance;
-    return this.http.post(this.buildUrl(instance.constructor),JSON.stringify(payload), {headers: headers})
-      .map(res => res.json().data)
-      .map((props) => new instance.constructor(props));
+    return this.http.post(this.buildUrl(instance.constructor),this.serializer.serialize(instance), {headers: headers})
+      .map(res => this.serializer.deserializeOne(res, instance.constructor));
   }
 
 }
