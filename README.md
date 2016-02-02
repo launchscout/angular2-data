@@ -1,6 +1,6 @@
 # angular2-data
 
-This is project is a data layer for angular2. It's still early times, but comes with an (example project)[https://github.com/gaslight/angular2-data-example] based on the Heroes tutorial from the angular2 documentation.
+This is project is a data layer for angular2. It's still early times, but comes with an [example project](https://github.com/gaslight/angular2-data-example) based on the Heroes tutorial from the angular2 documentation.
 
 ## Installation
 
