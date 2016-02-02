@@ -17,11 +17,14 @@
     "url": "git+https://github.com/gaslight/angular2-data.git"
   },
   "keywords": [
-    "es6",
-    "modules",
-    "rollup",
-    "bundle",
-    "browser"
+    "angular2",
+    "http",
+    "rest",
+    "ng-resource",
+    "ngResource",
+    "REST",
+    "jsonapi",
+    "data"
   ],
   "author": "Chris Nelson",
   "license": "MIT",
