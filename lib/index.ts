@@ -48,4 +48,11 @@ export class Store {
       .map(res => this.serializer.deserializeOne(res, instance.constructor));
   }
 
+  update(instance) {
+    let headers = new Headers();
+    headers.append("Content-Type", "application/json");
+    return this.http.put(`${this.buildUrl(instance.constructor)}/${instance.id}`,this.serializer.serialize(instance), {headers: headers})
+      .map(res => this.serializer.deserializeOne(res, instance.constructor));
+  }
+
 }

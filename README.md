@@ -67,10 +67,13 @@ this.store.create(new Thing({name: "Bob"})).subscribe((thing) => {
 });
 ```
 
+## TODONE
+
+* Tests (thank to angular2-testing, jasmine, and rollup!)
+* update
+
 ## TODO
 
-* Tests (this is really just a spike without them)
-* Update
 * Delete
 * Relationships
 * jsonapi support

@@ -75,4 +75,20 @@ describe('Store', () => {
     });
   }));
 
+  it("updates models", inject([XHRBackend, TestStore], (mockBackend, store) => {
+    mockBackend.connections.subscribe( (connection) => {
+      expect(connection.request.url).toMatch(/my_models\/1/);
+      expect(connection.request.headers.get("Content-Type")).toEqual("application/json");
+      expect(RequestMethod[connection.request.method]).toEqual("Put");
+      expect(JSON.parse(connection.request.text()).data.name).toEqual("foo");
+      connection.mockRespond(new Response(new ResponseOptions({
+        body: JSON.stringify({data: {id: 1, name: "foo"}})
+      })));
+    });
+    let myModel = new MyModel({id: 1, name: "foo"});
+    store.update(myModel).subscribe( (myModel) => {
+      expect(myModel.name).toEqual("foo");
+    });
+  }));
+
 });
