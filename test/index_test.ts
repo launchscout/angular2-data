@@ -1,7 +1,7 @@
 import { Store, StoreConfig } from '../lib/index';
-import { strictEqual } from 'assert';
 import "reflect-metadata";
 import {provide} from 'angular2/core';
+import _ from "underscore";
 import {
   describe,
   expect,
@@ -12,12 +12,14 @@ import {
   beforeEachProviders
 } from 'angular2/testing';
 import { Model } from "../lib/model";
-import { XHRBackend, HTTP_PROVIDERS, Response, ResponseOptions } from "angular2/http";
+import { XHRBackend, HTTP_PROVIDERS, Response, ResponseOptions, RequestMethod } from "angular2/http";
 import { MockBackend } from "angular2/http/testing";
 
 @Model({path: "/my_models"})
 class MyModel {
-  constructor(public attributes:Object) {}
+  constructor(attributes) {
+    _.extend(this, attributes);
+  }
 }
 
 @StoreConfig({
@@ -44,6 +46,7 @@ describe('Store', () => {
   it("gets models", inject([XHRBackend, TestStore], (mockBackend, store) => {
     expect(mockBackend).toBeDefined();
     mockBackend.connections.subscribe( (connection) => {
+      expect(connection.request.url).toMatch(/my_models/);
       connection.mockRespond(new Response(new ResponseOptions({
         body: JSON.stringify({data: [{id: 1, name: "foo"}]})
       })));
@@ -51,7 +54,25 @@ describe('Store', () => {
     expect(store).toBeDefined();
     store.query(MyModel).subscribe( (myModels) => {
       expect(myModels.length).toEqual(1);
-      expect(myModels[0].attributes.name).toEqual("foo");
+      expect(myModels[0].name).toEqual("foo");
     });
   }));
+
+  it("creates models", inject([XHRBackend, TestStore], (mockBackend, store) => {
+    mockBackend.connections.subscribe( (connection) => {
+      expect(connection.request.url).toMatch(/my_models/);
+      expect(connection.request.headers.get("Content-Type")).toEqual("application/json");
+      expect(RequestMethod[connection.request.method]).toEqual("Post");
+      expect(JSON.parse(connection.request.text()).data.name).toEqual("foo");
+      connection.mockRespond(new Response(new ResponseOptions({
+        body: JSON.stringify({data: {id: 1, name: "foo"}})
+      })));
+    });
+    let myModel = new MyModel({name: "foo"});
+    store.create(myModel).subscribe( (myModel) => {
+      expect(myModel.id).toEqual(1);
+      expect(myModel.name).toEqual("foo");
+    });
+  }));
+
 });
