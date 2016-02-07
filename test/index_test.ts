@@ -91,4 +91,19 @@ describe('Store', () => {
     });
   }));
 
+  it("deletes models", inject([XHRBackend, TestStore], (mockBackend, store) => {
+    mockBackend.connections.subscribe( (connection) => {
+      expect(connection.request.url).toMatch(/my_models\/1/);
+      expect(connection.request.headers.get("Content-Type")).toEqual("application/json");
+      expect(RequestMethod[connection.request.method]).toEqual("Delete");
+      connection.mockRespond(new Response(new ResponseOptions({
+        status: 204 // No content
+      })));
+    });
+    let myModel = new MyModel({id: 1, name: "foo"});
+    store.delete(myModel).subscribe( (response) => {
+      // dunno yet
+    });
+  }));
+
 });

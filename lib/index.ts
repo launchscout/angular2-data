@@ -55,4 +55,10 @@ export class Store {
       .map(res => this.serializer.deserializeOne(res, instance.constructor));
   }
 
+  delete(instance) {
+    let headers = new Headers();
+    headers.append("Content-Type", "application/json");
+    return this.http.delete(`${this.buildUrl(instance.constructor)}/${instance.id}`, {headers: headers});
+  }
+
 }
