@@ -1,4 +1,3 @@
-import {makeDecorator} from "angular2/src/core/util/decorators";
 
 export class StoreConfigMetadata {
   constructor(config) {
@@ -6,4 +5,12 @@ export class StoreConfigMetadata {
   }
 }
 
-export var StoreConfig = makeDecorator(StoreConfigMetadata);
+export var StoreConfig = function(config) {
+  return (store) => {
+    store.config = config;
+    console.log(store);
+    return store;
+  }
+}
+
+//makeDecorator(StoreConfigMetadata);

@@ -2,16 +2,18 @@ import { Injectable, Inject } from "angular2/core";
 import {Http, Headers} from 'angular2/http';
 import {reflector} from 'angular2/src/core/reflection/reflection';
 import "rxjs/Rx";
-export { StoreConfig } from "./store-config";
+import { StoreConfig } from "./store-config";
+export { StoreConfig };
 export { Model } from "./model";
 import { DefaultSerializer } from "./default-serializer";
 export { DefaultSerializer };
+import "reflect-metadata";
 
 export class Store {
   constructor(@Inject(Http) public http:Http) {}
 
   get config() {
-    return reflector.annotations(this.constructor)[0].config;
+    return this.constructor.config;
   }
 
   get serializer() {
